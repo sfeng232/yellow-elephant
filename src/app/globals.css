@@ -79,16 +79,21 @@ body {
 .snowflake {
   position: fixed;
   top: -2rem;
-  color: rgb(31 91 65 / 0.16);
+  color: var(--color-pine);
   pointer-events: none;
   user-select: none;
   animation: snow-fall linear infinite;
+  will-change: transform;
   z-index: 0;
 }
+/* Falls while swaying sideways by --drift (set per flake). */
 @keyframes snow-fall {
-  to { transform: translateY(110vh) rotate(360deg); }
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(var(--drift), 28vh) rotate(90deg); }
+  50% { transform: translate(0, 55vh) rotate(180deg); }
+  75% { transform: translate(calc(var(--drift) * -1), 83vh) rotate(270deg); }
+  100% { transform: translate(0, 110vh) rotate(360deg); }
 }
-
 /* ---- Flip card for the secret challenge ---- */
 .flip { perspective: 1200px; }
 .flip-inner {
