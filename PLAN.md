@@ -77,7 +77,7 @@
 - Host creates a game with settings and gets a join code, QR code and share link
 - Players join with code + name and get a secret challenge (flip-card reveal), with one re-roll
 - Host lobby updates live as players join or re-roll, and the host can remove players
-- 44 seed challenges, 17 seed twists, and fair letter pools (no Q/X/Z on easy or normal)
+- 41 seed challenges (categories and constraints; the wrapping type was removed later), 17 seed twists, and fair letter pools (no Q/X/Z on easy or normal)
 - Generator tests, Supabase schema, README
 
 ### ✅ Phase 2: Live game (turns and steals)

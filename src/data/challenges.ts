@@ -20,6 +20,9 @@ export const CHALLENGES: ChallengeDef[] = [
   { id: "cat-selfcare", type: "category", difficulty: "easy", text: "A self-care treat" },
   { id: "cat-game", type: "category", difficulty: "easy", text: "A game or toy" },
   { id: "cat-winter", type: "category", difficulty: "easy", text: "Something for winter" },
+  { id: "cat-movie-night", type: "category", difficulty: "easy", text: "Something for a movie night" },
+  { id: "cat-road-trip", type: "category", difficulty: "normal", text: "Something for a road trip" },
+  { id: "cat-picnic", type: "category", difficulty: "normal", text: "Something you'd bring to a picnic" },
   { id: "cat-gas-station", type: "category", difficulty: "normal", text: "Something you'd find at a gas station" },
   { id: "cat-lights-up", type: "category", difficulty: "normal", text: "Something that lights up", tags: ["electronic"], conflicts: ["edible"] },
   { id: "cat-90s", type: "category", difficulty: "normal", text: "Something that screams the 90s" },
@@ -31,6 +34,8 @@ export const CHALLENGES: ChallengeDef[] = [
   { id: "cat-grandma", type: "category", difficulty: "chaos", text: "Something a grandma would love — for a 25-year-old" },
   { id: "cat-useless", type: "category", difficulty: "chaos", text: "Something completely useless but beautiful" },
   { id: "cat-time-travel", type: "category", difficulty: "chaos", text: "Something a time traveller from 1850 would be baffled by", tags: ["electronic"], conflicts: ["edible"] },
+  { id: "cat-raccoon", type: "category", difficulty: "chaos", text: "Something a raccoon would steal" },
+  { id: "cat-wizard", type: "category", difficulty: "chaos", text: "Something a wizard would use" },
 
   // ---------- Constraints ----------
   { id: "con-half-price", type: "constraint", difficulty: "easy", text: "Costs under {half}" },
@@ -49,20 +54,10 @@ export const CHALLENGES: ChallengeDef[] = [
   { id: "con-set-of-3", type: "constraint", difficulty: "chaos", text: "Must come in a set of exactly 3" },
   { id: "con-animal", type: "constraint", difficulty: "chaos", text: "Must be shaped like an animal", conflicts: ["edible"] },
   { id: "con-weirdest", type: "constraint", difficulty: "chaos", text: "The weirdest thing in the store" },
-
-  // ---------- Wrapping ----------
-  { id: "wrap-newspaper", type: "wrapping", difficulty: "easy", text: "Wrapped in newspaper only" },
-  { id: "wrap-drawing", type: "wrapping", difficulty: "easy", text: "Wrapping decorated with your own drawing" },
-  { id: "wrap-big-bow", type: "wrapping", difficulty: "easy", text: "Topped with a bow that's far too big" },
-  { id: "wrap-one-colour", type: "wrapping", difficulty: "easy", text: "Wrapped in one single colour" },
-  { id: "wrap-disguise-shape", type: "wrapping", difficulty: "normal", text: "Disguised as a different shape" },
-  { id: "wrap-badly", type: "wrapping", difficulty: "normal", text: "Wrapped as badly as possible" },
-  { id: "wrap-reused", type: "wrapping", difficulty: "normal", text: "Packed in a box from a totally different product" },
-  { id: "wrap-no-tape", type: "wrapping", difficulty: "normal", text: "No tape allowed" },
-  { id: "wrap-layers", type: "wrapping", difficulty: "chaos", text: "Wrapped in at least 3 layers" },
-  { id: "wrap-clothing", type: "wrapping", difficulty: "chaos", text: "Wrapped in an item of clothing" },
-  { id: "wrap-foil", type: "wrapping", difficulty: "chaos", text: "Wrapped only in aluminium foil" },
-  { id: "wrap-fake-label", type: "wrapping", difficulty: "chaos", text: "Labelled as a completely different gift" },
+  { id: "con-sparkly", type: "constraint", difficulty: "normal", text: "Must be sparkly or glittery" },
+  { id: "con-thrift", type: "constraint", difficulty: "normal", text: "Must come from a thrift store", conflicts: ["edible"] },
+  { id: "con-two-uses", type: "constraint", difficulty: "easy", text: "Must have at least two uses" },
+  { id: "con-vintage", type: "constraint", difficulty: "chaos", text: "Must be older than the person who gets it", conflicts: ["edible"] },
 ];
 
 /**

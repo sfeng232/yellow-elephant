@@ -19,7 +19,7 @@ export function defaultSettings(difficulty: Difficulty = "normal"): GameSettings
   return {
     priceLimit: 25,
     difficulty,
-    challengeTypes: { category: true, letter: true, constraint: true, wrapping: true },
+    challengeTypes: { category: true, letter: true, constraint: true },
     twists: { enabled: true, chance: DEFAULT_TWIST_CHANCE[difficulty], enabledIds: defaultTwistIds(difficulty) },
     maxStealsPerGift: 3,
     finalSwap: true,

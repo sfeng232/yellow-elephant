@@ -14,7 +14,6 @@ const TYPE_HINTS: Record<ChallengeType, string> = {
   category: "“Something for the kitchen”",
   letter: "“Its name starts with P”",
   constraint: "“Must make noise”",
-  wrapping: "“Wrapped in newspaper only”",
 };
 
 export default function NewGamePage() {

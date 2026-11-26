@@ -6,14 +6,16 @@ export const TYPE_META: Record<ChallengeType, { label: string; emoji: string; cl
   category: { label: "Category", emoji: "🏷️", className: "bg-pine/10 text-pine" },
   letter: { label: "Letter rule", emoji: "🔤", className: "bg-gold-soft text-[#7a5410]" },
   constraint: { label: "Constraint", emoji: "📏", className: "bg-berry/10 text-berry-deep" },
-  wrapping: { label: "Wrapping", emoji: "🎀", className: "bg-[#e9e3f5] text-[#4b3a7a]" },
 };
+
+/** Games created before a type was removed may still hold rules of that type. */
+const FALLBACK_META = { label: "Rule", emoji: "📌", className: "bg-ink/5 text-ink" };
 
 export function RuleList({ challenge, animate = false }: { challenge: Challenge; animate?: boolean }) {
   return (
     <ul className="space-y-2.5">
       {challenge.rules.map((rule, i) => {
-        const meta = TYPE_META[rule.type];
+        const meta = TYPE_META[rule.type] ?? FALLBACK_META;
         return (
           <li
             key={rule.id}
@@ -47,7 +49,7 @@ export function ChallengeCard({
   /** Changes when the challenge is re-rolled, to replay the entrance animation. */
   rerollKey: string;
 }) {
-  const combo = challenge.rules.filter((r) => r.type !== "wrapping").length > 1;
+  const combo = challenge.rules.length > 1;
   return (
     <div className="flip">
       <div className={`flip-inner grid ${revealed ? "is-flipped" : ""}`}>

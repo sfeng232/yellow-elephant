@@ -7,8 +7,8 @@ import { defaultSettings, parseSettings } from "@/lib/settings";
 import type { ChallengeType, Difficulty } from "@/lib/types";
 
 const MODES: Difficulty[] = ["easy", "normal", "chaos"];
-const allOn = { category: true, letter: true, constraint: true, wrapping: true };
-const only = (t: ChallengeType) => ({ category: false, letter: false, constraint: false, wrapping: false, [t]: true });
+const allOn = { category: true, letter: true, constraint: true };
+const only = (t: ChallengeType) => ({ category: false, letter: false, constraint: false, [t]: true });
 
 describe("seed data", () => {
   it("has at least 40 challenges and 15 twists with unique ids", () => {
@@ -19,7 +19,7 @@ describe("seed data", () => {
   });
 
   it("is balanced: every type has rules at every difficulty", () => {
-    for (const type of ["category", "constraint", "wrapping"] as const) {
+    for (const type of ["category", "constraint"] as const) {
       for (const d of MODES) {
         expect(CHALLENGES.filter((c) => c.type === type && c.difficulty === d).length, `${type}/${d}`).toBeGreaterThanOrEqual(3);
       }
@@ -61,7 +61,7 @@ describe("generateChallenge", () => {
     const rng = seededRng(4);
     for (let i = 0; i < 500; i++) {
       const c = generateChallenge({ settings: { ...defaultSettings("easy"), challengeTypes: allOn }, rng });
-      expect(c.rules.filter((r) => r.type !== "wrapping")).toHaveLength(1);
+      expect(c.rules).toHaveLength(1);
       expect(c.rules.every((r) => r.difficulty === "easy")).toBe(true);
     }
   });
@@ -70,13 +70,13 @@ describe("generateChallenge", () => {
     const rng = seededRng(5);
     const all = Array.from({ length: 500 }, () => generateChallenge({ settings: defaultSettings("normal"), rng }));
     expect(all.every((c) => c.rules.every((r) => r.difficulty !== "chaos"))).toBe(true);
-    expect(all.some((c) => c.rules.filter((r) => r.type !== "wrapping").length === 2)).toBe(true);
+    expect(all.some((c) => c.rules.length === 2)).toBe(true);
   });
 
   it("chaos always combos (2–3 gift rules) when all types are on", () => {
     const rng = seededRng(6);
     for (let i = 0; i < 500; i++) {
-      const n = generateChallenge({ settings: defaultSettings("chaos"), rng }).rules.filter((r) => r.type !== "wrapping").length;
+      const n = generateChallenge({ settings: defaultSettings("chaos"), rng }).rules.length;
       expect(n).toBeGreaterThanOrEqual(2);
       expect(n).toBeLessThanOrEqual(3);
     }
@@ -94,7 +94,7 @@ describe("generateChallenge", () => {
 
   it("only uses enabled types", () => {
     const rng = seededRng(8);
-    for (const t of ["category", "letter", "constraint", "wrapping"] as const) {
+    for (const t of ["category", "letter", "constraint"] as const) {
       for (let i = 0; i < 100; i++) {
         const c = generateChallenge({ settings: { ...defaultSettings("chaos"), challengeTypes: only(t) }, rng });
         expect(c.rules.length).toBeGreaterThan(0);
@@ -103,8 +103,16 @@ describe("generateChallenge", () => {
     }
   });
 
+  it("ignores the removed wrapping type in games saved before it was removed", () => {
+    const old = { ...defaultSettings("chaos"), challengeTypes: { ...allOn, wrapping: true } as typeof allOn };
+    const c = generateChallenge({ settings: old, rng: seededRng(13) });
+    expect(c.rules.every((r) => ["category", "letter", "constraint"].includes(r.type))).toBe(true);
+    const onlyWrapping = { category: false, letter: false, constraint: false, wrapping: true } as unknown as typeof allOn;
+    expect(() => generateChallenge({ settings: { ...defaultSettings(), challengeTypes: onlyWrapping } })).toThrow(/at least one/i);
+  });
+
   it("throws if nothing is enabled", () => {
-    const off = { category: false, letter: false, constraint: false, wrapping: false };
+    const off = { category: false, letter: false, constraint: false };
     expect(() => generateChallenge({ settings: { ...defaultSettings(), challengeTypes: off } })).toThrow();
   });
 
@@ -168,7 +176,7 @@ describe("parseSettings", () => {
     expect(parseSettings(null).ok).toBe(false);
     expect(parseSettings({ ...defaultSettings(), difficulty: "nightmare" }).ok).toBe(false);
     expect(parseSettings({ ...defaultSettings(), priceLimit: 0 }).ok).toBe(false);
-    expect(parseSettings({ ...defaultSettings(), challengeTypes: { category: false, letter: false, constraint: false, wrapping: false } }).ok).toBe(false);
+    expect(parseSettings({ ...defaultSettings(), challengeTypes: { category: false, letter: false, constraint: false } }).ok).toBe(false);
   });
   it("clamps and cleans values", () => {
     const r = parseSettings({ ...defaultSettings(), maxStealsPerGift: 99, twists: { enabled: true, chance: 7, enabledIds: ["reverse", "nope", "reverse"] } });

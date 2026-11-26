@@ -2,7 +2,7 @@
 
 A mobile-first white elephant gift exchange with two layers of twists:
 
-1. **Gift challenges** before the party. Every player gets a secret rule their gift has to follow ("Something for the kitchen", "Its name starts with P", "Wrapped in newspaper only"), and can re-roll it once.
+1. **Gift challenges** before the party. Every player gets a secret rule their gift has to follow ("Something for the kitchen", "Its name starts with P", "Must make noise"), and can re-roll it once.
 2. **Game twists** during the party. Random events fire between turns ("Pass to the left!", "Steal freeze").
 
 Built with Next.js 16, TypeScript, Tailwind CSS 4 and Supabase Realtime. There's no login: games are found by a 5-character join code and expire after 48 hours.
@@ -96,7 +96,7 @@ Challenges are plain TypeScript in [`src/data/challenges.ts`](src/data/challenge
 | Field | Values | Notes |
 | --- | --- | --- |
 | `id` | any unique string | A test checks that ids are unique. |
-| `type` | `"category"`, `"constraint"`, `"wrapping"` | Letter rules are generated (see below). |
+| `type` | `"category"`, `"constraint"` | Letter rules are generated (see below). |
 | `difficulty` | `"easy"`, `"normal"`, `"chaos"` | Easy rules appear in every mode, normal rules in normal and chaos, chaos rules only in chaos. |
 | `text` | string | Can include `{limit}`, `{half}` or `{quarter}`, which are filled in from the game's price limit, e.g. `"Costs under {half}"` becomes "Costs under $15" with a $30 limit. |
 | `tags` | optional string[] | Describes the rule, e.g. `["edible"]`. |
@@ -104,11 +104,11 @@ Challenges are plain TypeScript in [`src/data/challenges.ts`](src/data/challenge
 
 **How many rules each mode hands out:**
 
-| Mode | Gift rules | Extra wrapping rule | Rule pool |
-| --- | --- | --- | --- |
-| Easy | 1 | 25% chance | easy only |
-| Normal | 1, sometimes 2 (35%) | 40% chance | easy + normal, normal favoured |
-| Chaos | 2, sometimes 3 (30%) | 75% chance | everything, chaos favoured |
+| Mode | Rules | Rule pool |
+| --- | --- | --- |
+| Easy | 1 | easy only |
+| Normal | 1, sometimes 2 (35%) | easy + normal, normal favoured |
+| Chaos | 2, sometimes 3 (30%) | everything, chaos favoured |
 
 Each challenge has at most one rule of each type, so a combo reads like "Something for the kitchen + its name starts with S". The generator also tries not to repeat rules other players in the same game already have.
 

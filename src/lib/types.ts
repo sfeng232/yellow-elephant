@@ -2,10 +2,10 @@
 
 export type Difficulty = "easy" | "normal" | "chaos";
 
-/** The four kinds of gift challenge a host can switch on or off. */
-export type ChallengeType = "category" | "letter" | "constraint" | "wrapping";
+/** The kinds of gift challenge a host can switch on or off. */
+export type ChallengeType = "category" | "letter" | "constraint";
 
-export const CHALLENGE_TYPES: ChallengeType[] = ["category", "letter", "constraint", "wrapping"];
+export const CHALLENGE_TYPES: ChallengeType[] = ["category", "letter", "constraint"];
 
 /** A hand-written challenge in src/data/challenges.ts. Letter rules are generated, not listed. */
 export interface ChallengeDef {

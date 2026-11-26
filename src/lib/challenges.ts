@@ -2,8 +2,7 @@ import { CHALLENGES, LETTER_POOLS } from "@/data/challenges";
 import { pick, pickWeighted, shuffle, type Rng } from "@/lib/random";
 import type { Challenge, ChallengeDef, ChallengeRule, ChallengeType, Difficulty, GameSettings } from "@/lib/types";
 
-type GiftRuleType = Exclude<ChallengeType, "wrapping">;
-const GIFT_RULE_TYPES: GiftRuleType[] = ["category", "letter", "constraint"];
+const GIFT_RULE_TYPES: ChallengeType[] = ["category", "letter", "constraint"];
 
 /** How strongly each mode favours rules of each difficulty. 0 = never used. */
 const DIFFICULTY_WEIGHTS: Record<Difficulty, Record<Difficulty, number>> = {
@@ -13,10 +12,10 @@ const DIFFICULTY_WEIGHTS: Record<Difficulty, Record<Difficulty, number>> = {
 };
 
 /** How many rules each mode hands out. */
-const MODE_SHAPE: Record<Difficulty, { giftRules: (rng: Rng) => number; wrappingChance: number }> = {
-  easy: { giftRules: () => 1, wrappingChance: 0.25 },
-  normal: { giftRules: (rng) => (rng() < 0.35 ? 2 : 1), wrappingChance: 0.4 },
-  chaos: { giftRules: (rng) => (rng() < 0.3 ? 3 : 2), wrappingChance: 0.75 },
+const RULE_COUNT: Record<Difficulty, (rng: Rng) => number> = {
+  easy: () => 1,
+  normal: (rng) => (rng() < 0.35 ? 2 : 1),
+  chaos: (rng) => (rng() < 0.3 ? 3 : 2),
 };
 
 export function formatMoney(amount: number): string {
@@ -84,18 +83,16 @@ export interface GenerateOptions {
 }
 
 export function enabledTypes(settings: Pick<GameSettings, "challengeTypes">): ChallengeType[] {
-  return (Object.keys(settings.challengeTypes) as ChallengeType[]).filter((t) => settings.challengeTypes[t]);
+  // Only known types count (games saved earlier may still list a removed type).
+  return GIFT_RULE_TYPES.filter((t) => settings.challengeTypes[t]);
 }
 
 /** Creates one player's secret challenge. Always returns at least one rule. */
 export function generateChallenge({ settings, rng = Math.random, avoidIds = new Set(), pool = CHALLENGES }: GenerateOptions): Challenge {
   const mode = settings.difficulty;
-  const on = settings.challengeTypes;
-  if (enabledTypes(settings).length === 0) throw new Error("At least one challenge type must be enabled");
-
-  const shape = MODE_SHAPE[mode];
-  const giftTypes = GIFT_RULE_TYPES.filter((t) => on[t]);
-  const wanted = Math.min(shape.giftRules(rng), giftTypes.length);
+  const giftTypes = enabledTypes(settings);
+  if (giftTypes.length === 0) throw new Error("At least one challenge type must be enabled");
+  const wanted = Math.min(RULE_COUNT[mode](rng), giftTypes.length);
 
   const rules: ChallengeRule[] = [];
   const chosenDefs: ChallengeDef[] = [];
@@ -116,14 +113,9 @@ export function generateChallenge({ settings, rng = Math.random, avoidIds = new 
     }
   }
 
-  // Keep category/letter/constraint first, then wrapping.
-  const order: Record<ChallengeType, number> = { category: 0, letter: 1, constraint: 2, wrapping: 3 };
+  // Always show them in the same order: category, letter, constraint.
+  const order: Record<ChallengeType, number> = { category: 0, letter: 1, constraint: 2 };
   rules.sort((a, b) => order[a.type] - order[b.type]);
-
-  if (on.wrapping && (rules.length === 0 || rng() < shape.wrappingChance)) {
-    const def = pickDef("wrapping", mode, chosenDefs, avoidIds, rng, pool);
-    if (def) rules.push(defToRule(def, settings.priceLimit));
-  }
 
   if (rules.length === 0) throw new Error("No challenges available for these settings");
   return { rules };
