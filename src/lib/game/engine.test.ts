@@ -132,7 +132,7 @@ describe("ending", () => {
     let s = playAllOpens(fresh());
     const mine = giftOf(s, "a");
     const theirs = giftOf(s, "d");
-    s = act(s, { type: "finalSwap", by: "a", giftId: theirs.id });
+    s = act(s, { type: "swap", by: "a", giftId: theirs.id });
     expect(s.phase).toBe("ended");
     expect(s.actor).toBeNull();
     expect(giftOf(s, "a").id).toBe(theirs.id);
@@ -143,7 +143,7 @@ describe("ending", () => {
   it("final swap can keep instead", () => {
     let s = playAllOpens(fresh());
     const before = s.gifts;
-    s = act(s, { type: "finalSwap", by: "a", giftId: null });
+    s = act(s, { type: "swap", by: "a", giftId: null });
     expect(s.phase).toBe("ended");
     expect(s.gifts).toEqual(before);
   });
@@ -172,7 +172,7 @@ describe("ending", () => {
       while (s.phase !== "ended" && guard++ < 200) {
         const me = s.actor!;
         if (s.phase === "finalSwap") {
-          s = act(s, { type: "finalSwap", by: me, giftId: rng() < 0.5 ? null : (stealableGifts(s, me, settings)[0]?.id ?? null) });
+          s = act(s, { type: "swap", by: me, giftId: rng() < 0.5 ? null : (stealableGifts(s, me, settings)[0]?.id ?? null) });
           continue;
         }
         const options = stealableGifts(s, me, settings);

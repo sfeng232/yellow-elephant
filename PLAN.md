@@ -90,8 +90,15 @@
 - Host page: act for whoever's move it is, **Undo** last move (votes survive), **End game**
 - A pure `applyAction(state, action)` engine in `src/lib/game/engine.ts` with 24 tests, including 50 random full games. Saves use optimistic concurrency, so double taps and simultaneous steals can't corrupt the game
 
-### Phase 3: Twists, big screen, awards
-- After each turn, a twist fires at the configured chance (from the enabled list) and its effect is applied by the engine
-- `/screen/[code]`: TV layout with an animated twist card ("🔁 REVERSE!"), steal swoosh and gift board
-- End screen: final ownership, plus **Most Stolen**, **Best Rule Follower** (most 👍), **Most Creative Interpretation** (a separate vote), **Rule Breaker**, and **Biggest Thief**
-- Twist engine tests
+### ✅ Phase 3: Twists, big screen, awards
+- After each turn ends (someone opens a gift), a twist fires at the configured chance, picked from the enabled list. Twists that would do nothing right now are skipped, e.g. "pass left" with only one gift out
+- All 17 seed twists change the game state (or are "announce" cards): pass left/right, reverse, steal freeze (N turns), amnesty (unlock), bonus swaps (`bonusSwap` phase), random swap, blizzard (shuffle), fresh-gifts-only, heist (must steal), free steal, and mystery pick (shuffled face-down cards)
+- Phones show a full-screen twist card, and active effects appear as chips under the turn banner
+- `/screen/[code]`: the TV view. The lobby shows a giant code, QR code and the players joining. During the game it shows whose move it is, the gift board with live votes, and auto-closing full-screen reveals, twist cards and steal banners. At the end it's the awards ceremony
+- End awards: **Most Stolen**, **Best Rule Follower** (net 👍), **Most Creative Interpretation** (an end-of-game ballot), **Rule Breaker** (net 👎), **Biggest Thief** and **Most Robbed**. Ties share the award
+- Engine split into `rules.ts` (queries), `twists.ts` (effects) and `engine.ts` (actions), plus `awards.ts`. 23 new tests, including 150 random full games with twists firing 60% of the time
+
+## Ideas for later
+- Rejoin on a new device (a per-player recovery PIN shown in the host lobby)
+- Sound effects on the TV screen
+- Custom challenge packs that hosts can upload as JSON

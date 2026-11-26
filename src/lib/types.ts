@@ -37,7 +37,7 @@ export type TwistEffect =
   | { kind: "reverseOrder" }
   | { kind: "stealLock"; turns: number }
   | { kind: "unlockAll" }
-  | { kind: "swapAny"; who: "previous" | "next" }
+  | { kind: "swapAny"; who: "previous" | "random" }
   | { kind: "swapRandom" }
   | { kind: "shuffleAll" }
   | { kind: "blindPick" }
@@ -87,18 +87,33 @@ export interface Gift {
   broughtBy: string;
   label: string;
   holder: string;
+  /** Total times stolen (used for "Most Stolen"). */
   stealCount: number;
+  /** Steals that don't count toward the lock (free steals, amnesty). Locked when stealCount - lockOffset >= limit. */
+  lockOffset?: number;
   openedAtTurn: number;
   /** Copied from the bringer when opened, so it's public from then on. */
   challenge: Challenge;
   votes: Record<string, Vote>;
 }
 
-export type LivePhase = "turns" | "finalSwap" | "ended";
+/** "bonusSwap" is a mid-game swap granted by a twist; "finalSwap" is the finale. */
+export type LivePhase = "turns" | "bonusSwap" | "finalSwap" | "ended";
+
+/** One-move rules set by twists; cleared after the next open or steal. */
+export interface Modifiers {
+  mustOpen?: boolean;
+  mustSteal?: boolean;
+  freeSteal?: boolean;
+  blindPick?: boolean;
+}
 
 export interface GameEvent {
   seq: number;
-  kind: "start" | "open" | "steal" | "swap" | "keep" | "end" | "undo";
+  kind: "start" | "open" | "steal" | "swap" | "keep" | "end" | "undo" | "twist";
+  twistId?: string;
+  /** For twists: a short note on what happened, e.g. who got the bonus swap. */
+  note?: string;
   /** Who did it (for undo/end, the host's player id if they play, else ""). */
   by: string;
   giftId?: string;
@@ -118,6 +133,16 @@ export interface LiveState {
   gifts: Gift[];
   /** The player just stolen from may not immediately steal that same gift back. */
   noStealBack: { giftId: string; playerId: string } | null;
+  // ---- Twists (Phase 3) ----
+  modifiers?: Modifiers;
+  /** Turns left during which nobody can steal. */
+  stealLockTurns?: number;
+  /** Where play resumes after a twist's bonus swap. */
+  resumeActor?: string | null;
+  // ---- Stats for awards ----
+  stats?: { steals: Record<string, number>; stolenFrom: Record<string, number> };
+  /** End-of-game "Most Creative Interpretation" ballot: voter → gift. */
+  creativeVotes?: Record<string, string>;
   seq: number;
   events: GameEvent[];
   /** Snapshots for the host's undo button (newest last). */
@@ -128,8 +153,9 @@ export interface LiveState {
 export type ClientAction =
   | { type: "open"; label: string; broughtBy: string }
   | { type: "steal"; giftId: string }
-  | { type: "finalSwap"; giftId: string | null }
+  | { type: "swap"; giftId: string | null }
   | { type: "vote"; giftId: string; vote: Vote | null }
+  | { type: "creativeVote"; giftId: string | null }
   | { type: "end" }
   | { type: "undo" };
 

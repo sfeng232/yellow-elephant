@@ -1,4 +1,5 @@
 import { playerName } from "@/lib/game/engine";
+import { twistById } from "@/lib/game/twists";
 import type { GameEvent, PublicLiveState } from "@/lib/types";
 
 export function giftLabel(state: PublicLiveState, giftId?: string) {
@@ -23,5 +24,9 @@ export function describeEvent(state: PublicLiveState, e: GameEvent): { emoji: st
       return { emoji: "↩️", text: "The host undid the last move" };
     case "end":
       return { emoji: "🏁", text: "That's a wrap!" };
+    case "twist": {
+      const t = twistById(e.twistId);
+      return { emoji: t?.emoji ?? "🌀", text: `Twist: ${t?.title ?? "something happened"}${e.note ? ` (${e.note})` : ""}` };
+    }
   }
 }

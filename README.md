@@ -7,7 +7,7 @@ A mobile-first white elephant gift exchange with two layers of twists:
 
 Built with Next.js 16, TypeScript, Tailwind CSS 4 and Supabase Realtime. There's no login: games are found by a 5-character join code and expire after 48 hours.
 
-> **Status:** Phase 1 (challenges) and Phase 2 (the live game with turns, steals and reveal votes) are done. See [PLAN.md](PLAN.md) for the roadmap.
+> **Status:** all three phases are done: challenges, the live game, twists, the TV screen and awards. See [PLAN.md](PLAN.md).
 
 ## How a game runs
 
@@ -15,8 +15,13 @@ Built with Next.js 16, TypeScript, Tailwind CSS 4 and Supabase Realtime. There's
 2. **At the party:** the host taps **Start**, which shuffles the turn order. On your turn your phone says *Your move!*:
    - **Open a gift:** type what it is and pick who brought it. Everyone's phone shows that person's challenge, so the group can vote 👍 or 👎 on whether they followed it.
    - **Steal:** take an opened gift. The person you stole from moves next. They can't steal it straight back, and a gift locks after the steal limit.
-3. **Finale:** with **final swap** on, the first player may swap with any unlocked gift once every gift is open.
-4. **The host page doubles as a control panel.** The host can act for anyone who's stuck, undo a mis-tap, or end the game early.
+3. **Twists:** after each turn there's a chance (set by the host) that a twist fires: "Pass to the left!", "Steal freeze", "Mystery pick"… Every phone and the TV show the twist card, and the app applies its effect.
+4. **Finale:** with **final swap** on, the first player may swap with any unlocked gift once every gift is open.
+5. **Awards:** the end screen hands out Most Stolen, Best Rule Follower, Most Creative Interpretation (everyone votes), Rule Breaker, Biggest Thief and Most Robbed.
+
+**The host page doubles as a control panel.** The host can act for anyone who's stuck, undo a mis-tap, or end the game early.
+
+**TV mode:** open `/screen/<CODE>` on a laptop plugged into the TV. There's a link to it on the host page. It shows the QR code while people join, then the turn, the gift board, and big animated reveals, twists and awards. It's view-only and never shows anyone's challenge before their gift is opened.
 
 ---
 
@@ -43,6 +48,7 @@ npm run lint
 The tests live next to the code (`src/**/*.test.ts`):
 - `src/lib/challenges.test.ts`: the challenge generator (fair letters, difficulty rules, combos, conflicts, re-rolls, settings validation)
 - `src/lib/game/engine.test.ts`: turns and steals (turn order, steal chains, no steal-backs, locks, final swap, votes, undo, and 50 random full games)
+- `src/lib/game/twists.test.ts`: every twist's effect, twist chance and filtering, awards, and 150 random full games with twists
 
 ---
 
@@ -120,7 +126,22 @@ Twists live in [`src/data/twists.ts`](src/data/twists.ts). The easiest custom tw
   effect: { kind: "announce" } },
 ```
 
-Other `kind`s (`pass`, `reverseOrder`, `stealLock`, …) change the game state and are wired up in Phase 3. Hosts can switch individual twists on or off when they create a game.
+You can also reuse any built-in effect with your own wording:
+
+| `effect` | What the app does |
+| --- | --- |
+| `{ kind: "pass", direction: "left" \| "right" }` | Every gift moves to the next/previous holder in turn order |
+| `{ kind: "reverseOrder" }` | The remaining turn order flips |
+| `{ kind: "stealLock", turns: N }` | No steals for the next N turns |
+| `{ kind: "unlockAll" }` | Locked gifts can be stolen again |
+| `{ kind: "swapAny", who: "previous" \| "random" }` | The last opener, or a random holder, may swap with anyone |
+| `{ kind: "swapRandom" }` | Two random holders swap |
+| `{ kind: "shuffleAll" }` | All opened gifts are shuffled between holders |
+| `{ kind: "mustOpen" }` / `{ kind: "mustSteal" }` | The next move must be an open / a steal |
+| `{ kind: "freeSteal" }` | A steal on the next move doesn't count toward the lock |
+| `{ kind: "blindPick" }` | The next player picks from shuffled face-down cards |
+
+Twists only fire when they'd actually do something, so "pass left" never fires with just one gift out. Hosts can switch individual twists on or off when they create a game. To invent a brand-new effect, add a `kind` to `TwistEffect` in `src/lib/types.ts`, then handle it in `twistApplicable` and `applyTwist` in `src/lib/game/twists.ts`. TypeScript will point out anything you've missed.
 
 ---
 
@@ -132,12 +153,16 @@ src/
     api/games/...         Create, view, join, re-roll, remove player, start, action
     host/new, host/[code] Host setup, lobby, and live host controls
     join, play/[code]     Player join, secret challenge, live game
+    screen/[code]         Big-screen TV view
   components/             UI pieces (flip card, buttons, snow)
     live/                 Live game board, turn controls, reveal and steal overlays
   data/                   ✏️ challenges.ts and twists.ts — edit these!
   lib/
     challenges.ts         The challenge generator (pure, tested)
-    game/engine.ts        Turn and steal rules (pure, tested)
+    game/engine.ts        Turn and steal actions (pure, tested)
+    game/rules.ts         Read-only rule checks shared with the UI
+    game/twists.ts        Twist rolling and effects
+    game/awards.ts        End-of-game awards
     settings.ts           Defaults and validation for host settings
     server/               Server-only: storage, tokens, realtime pings
     client/               Browser-only: API calls, session, live sync hook

@@ -1,20 +1,19 @@
 "use client";
 
 import { RuleList } from "@/components/challenge-card";
-import { isLocked, playerName, voteSummary } from "@/lib/game/engine";
+import { playerName, stealsLeft, voteSummary } from "@/lib/game/engine";
 import type { Gift, PublicLiveState, Vote } from "@/lib/types";
 
 /** Dots showing how many steals a gift has left before it locks. */
 export function StealMeter({ gift, max }: { gift: Gift; max: number }) {
-  const locked = gift.stealCount >= max;
+  const left = stealsLeft(gift, max);
+  const used = max - left;
   return (
-    <span className="inline-flex items-center gap-1" aria-label={locked ? "Locked" : `Stolen ${gift.stealCount} of ${max} times`}>
-      {locked ? (
+    <span className="inline-flex shrink-0 items-center gap-1" aria-label={left === 0 ? "Locked" : `${left} steal${left === 1 ? "" : "s"} left before it locks`}>
+      {left === 0 ? (
         <span className="rounded-full bg-ink/80 px-2 py-0.5 text-xs font-semibold text-white">🔒 Locked</span>
       ) : (
-        Array.from({ length: max }, (_, i) => (
-          <span key={i} className={`h-2 w-2 rounded-full ${i < gift.stealCount ? "bg-berry" : "bg-ink/15"}`} />
-        ))
+        Array.from({ length: max }, (_, i) => <span key={i} className={`h-2 w-2 rounded-full ${i < used ? "bg-berry" : "bg-ink/15"}`} />)
       )}
     </span>
   );
@@ -76,7 +75,7 @@ export function GiftRow({
   highlight?: boolean;
 }) {
   return (
-    <li className={`rounded-2xl bg-cream p-3.5 animate-pop-in ${highlight ? "ring-2 ring-gold" : ""} ${isLocked(gift, { maxStealsPerGift: max, finalSwap: false }) ? "opacity-90" : ""}`}>
+    <li className={`rounded-2xl bg-cream p-3.5 animate-pop-in ${highlight ? "ring-2 ring-gold" : ""}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="font-display text-lg font-semibold leading-tight">{gift.label}</p>

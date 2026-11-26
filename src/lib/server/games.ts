@@ -208,10 +208,12 @@ export function parseClientAction(body: Record<string, unknown>): ClientAction {
       return { type: "open", label: str(body.label).replace(/\s+/g, " ").trim().slice(0, 60), broughtBy: str(body.broughtBy) };
     case "steal":
       return { type: "steal", giftId: str(body.giftId) };
-    case "finalSwap":
-      return { type: "finalSwap", giftId: body.giftId === null ? null : str(body.giftId) };
+    case "swap":
+      return { type: "swap", giftId: body.giftId === null ? null : str(body.giftId) };
     case "vote":
       return { type: "vote", giftId: str(body.giftId), vote: body.vote === "up" || body.vote === "down" ? body.vote : null };
+    case "creativeVote":
+      return { type: "creativeVote", giftId: body.giftId === null ? null : str(body.giftId) };
     case "end":
     case "undo":
       return { type: body.type };
@@ -234,7 +236,7 @@ export async function performAction(code: string, creds: Credentials, action: Cl
       return { state: applyAction(state, { type: action.type, by: me?.id ?? "" }, settings) };
     }
 
-    if (action.type === "vote") {
+    if (action.type === "vote" || action.type === "creativeVote") {
       if (!me) throw new GameError(403, "Only players can vote");
       return { state: applyAction(state, { ...action, by: me.id }, settings) };
     }

@@ -19,13 +19,13 @@ export const TWISTS: TwistDef[] = [
   { id: "steal-lock-2", emoji: "🔒", difficulty: "normal", title: "Steal freeze", description: "Steals are locked for the next 2 turns.", effect: { kind: "stealLock", turns: 2 } },
   { id: "prev-swap", emoji: "🔄", difficulty: "normal", title: "Second thoughts", description: "The player who just went may swap gifts with anyone.", effect: { kind: "swapAny", who: "previous" } },
   { id: "blind-pick", emoji: "🙈", difficulty: "normal", title: "Mystery pick", description: "The next player picks blind from a shuffled list of every gift.", effect: { kind: "blindPick" } },
-  { id: "free-steal", emoji: "🎟️", difficulty: "normal", title: "Free steal", description: "The next steal doesn't count toward that gift's steal limit.", effect: { kind: "freeSteal" } },
+  { id: "free-steal", emoji: "🎟️", difficulty: "normal", title: "Free steal", description: "If the next player steals, it doesn't count toward that gift's steal limit.", effect: { kind: "freeSteal" } },
   { id: "rule-confession", emoji: "🕵️", difficulty: "normal", title: "Confession time", description: "Anyone who bent their gift rule must admit it now — or forever hold their peace.", effect: { kind: "announce" } },
 
   // ---------- Chaos ----------
   { id: "swap-random", emoji: "🎲", difficulty: "chaos", title: "Random swap", description: "Two random players swap their gifts.", effect: { kind: "swapRandom" } },
-  { id: "must-steal", emoji: "🦹", difficulty: "chaos", title: "Heist", description: "The next player must steal if any gift can be stolen.", effect: { kind: "mustSteal" } },
-  { id: "next-swap", emoji: "🌀", difficulty: "chaos", title: "Wild card", description: "The next player may swap with anyone instead of taking a normal turn.", effect: { kind: "swapAny", who: "next" } },
+  { id: "must-steal", emoji: "🦹", difficulty: "chaos", title: "Heist", description: "The next player must steal. No opening allowed!", effect: { kind: "mustSteal" } },
+  { id: "wild-card", emoji: "🌀", difficulty: "chaos", title: "Wild card", description: "A random player holding a gift may swap with anyone.", effect: { kind: "swapAny", who: "random" } },
   { id: "shuffle-all", emoji: "🌪️", difficulty: "chaos", title: "Blizzard", description: "Every opened gift is shuffled to a random holder.", effect: { kind: "shuffleAll" } },
   { id: "steal-lock-3", emoji: "🧊", difficulty: "chaos", title: "Deep freeze", description: "Steals are locked for the next 3 turns.", effect: { kind: "stealLock", turns: 3 } },
   { id: "dance-off", emoji: "💃", difficulty: "chaos", title: "Dance-off", description: "The two most recent openers dance for 15 seconds. The group picks a winner, who may swap with the loser.", effect: { kind: "announce" } },

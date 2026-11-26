@@ -1,7 +1,8 @@
 "use client";
 
-import QRCode from "qrcode";
-import { use, useEffect, useState } from "react";
+import Link from "next/link";
+import { use, useState } from "react";
+import { useJoinUrl } from "@/lib/client/use-join-url";
 import { TYPE_META } from "@/components/challenge-card";
 import { GameGate } from "@/components/game-gate";
 import { LiveGame } from "@/components/live/live-game";
@@ -19,21 +20,6 @@ export function HostLobby({ params }: { params: Promise<{ code: string }> }) {
       {(g) => (g.live && g.isHost ? <LiveGame game={g} mode="host" refresh={refresh} /> : <Lobby game={g} refresh={refresh} />)}
     </GameGate>
   );
-}
-
-function useJoinUrl(code: string) {
-  const [url, setUrl] = useState<string | null>(null);
-  const [qr, setQr] = useState<string | null>(null);
-  useEffect(() => {
-    const joinUrl = `${window.location.origin}/join?code=${code}`;
-    QRCode.toDataURL(joinUrl, { margin: 1, width: 360, color: { dark: "#123a2a", light: "#ffffff" } })
-      .catch(() => null)
-      .then((dataUrl) => {
-        setUrl(joinUrl);
-        setQr(dataUrl);
-      });
-  }, [code]);
-  return { url, qr };
 }
 
 function Lobby({ game, refresh }: { game: GameView; refresh: () => Promise<void> }) {
@@ -114,6 +100,9 @@ function Lobby({ game, refresh }: { game: GameView; refresh: () => Promise<void>
         <Button variant="gold" onClick={share} className="w-full">
           {copied ? "Link copied! ✨" : "Share invite link"}
         </Button>
+        <Link href={`/screen/${game.code}`} target="_blank" className="text-sm font-semibold text-pine underline-offset-4 hover:underline">
+          📺 Open the TV screen (shows the QR code big)
+        </Link>
       </Card>
 
       <Card className="mt-4">
