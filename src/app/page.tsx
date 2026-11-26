@@ -1,69 +1,63 @@
-import Image from "next/image";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Button, ButtonLink, Card, Page } from "@/components/ui";
 
 export default function Home() {
+  const router = useRouter();
+  const [code, setCode] = useState("");
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <Page className="flex flex-col justify-center">
+      <div className="mb-8 text-center animate-pop-in">
+        <div className="mb-3 text-7xl">
+          <span className="inline-block animate-wiggle" aria-hidden>
+            🐘
+          </span>
+          <span className="inline-block animate-wiggle [animation-delay:400ms]" aria-hidden>
+            🎁
+          </span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+        <h1 className="font-display text-5xl font-extrabold tracking-tight text-pine-deep">White Elephant</h1>
+        <p className="mx-auto mt-3 max-w-xs text-muted">
+          Secret gift challenges, sneaky steals and chaotic twists, all synced to everyone&apos;s phones.
+        </p>
+      </div>
+
+      <Card className="space-y-4 animate-pop-in [animation-delay:120ms]">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (code.trim()) router.push(`/join?code=${encodeURIComponent(code.trim().toUpperCase())}`);
+          }}
+          className="space-y-3"
+        >
+          <label htmlFor="code" className="block text-sm font-semibold text-muted">
+            Got a join code?
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="code"
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 5))}
+              placeholder="ABC12"
+              autoCapitalize="characters"
+              autoComplete="off"
+              className="min-w-0 flex-1 rounded-2xl bg-cream px-4 py-3 text-center font-display text-2xl font-semibold tracking-[0.3em] uppercase outline-none ring-pine/40 placeholder:text-ink/25 focus:ring-2"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <Button type="submit" disabled={code.length < 5}>
+              Join
+            </Button>
+          </div>
+        </form>
+        <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-widest text-muted/70">
+          <span className="h-px flex-1 bg-ink/10" /> or <span className="h-px flex-1 bg-ink/10" />
         </div>
-      </main>
-    </div>
+        <ButtonLink href="/host/new" variant="secondary" className="w-full">
+          🎄 Host a new game
+        </ButtonLink>
+      </Card>
+    </Page>
   );
 }
